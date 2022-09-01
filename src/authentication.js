@@ -22,7 +22,7 @@ export const UserContextProvider = ({children}) => {
 
 export async function checkLogin() {
     try {
-        const response = await axios.post(process.env.REACT_APP_BACKEND_LOGIN_URL);
+        const response = await axios.post(process.env.REACT_APP_BACKEND_LOGIN_URL, null, {withCredentials: true});
         return response.data;
     } catch(e) {
         return null;
