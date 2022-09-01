@@ -1,74 +1,51 @@
-import React from "react";
+import React, {useState} from "react";
+import { useUser } from "./authentication";
 const axios = require("axios").default;
 
-class LoginForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      email: "",
-      password: "",
-    };
+export default function LoginForm(props) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const {setUser} = useUser();
 
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChangeEmail = this.handleChangeEmail.bind(this);
-    this.handleChangePassword = this.handleChangePassword.bind(this);
-  }
-
-  async handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     // Set CSRF Cookie
-    await axios.get("http://wmmbe.test.local/sanctum/csrf-cookie");
+    await axios.get(process.env.REACT_APP_BACKEND_CSRF_TOKEN_URL);
 
     // Request to backend /login
     axios
-      .post("http://wmmbe.test.local/login", {
-        email: this.state.email,
-        password: this.state.password,
+      .post(process.env.REACT_APP_BACKEND_LOGIN_URL, {
+        email: email,
+        password: password,
       })
-      .then(function (response) {
-        console.log(response);
+      .then((response) => {
+        setUser(response.data)
       })
       .catch(function (error) {
         console.log(error);
       });
   }
 
-  handleChangeEmail(e) {
-    this.setState({
-      email: e.target.value,
-    });
-  }
-
-  handleChangePassword(e) {
-    this.setState({
-      password: e.target.value,
-    });
-  }
-
-  render() {
-    return (
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          Indirizzo e-mail:
-          <input
-            type="email"
-            value={this.state.email}
-            onChange={this.handleChangeEmail}
-          />
-        </label>
-        <label>
-          Password:
-          <input
-            type="password"
-            value={this.state.password}
-            onChange={this.handleChangePassword}
-          />
-        </label>
-        <input type="submit" value="Accedi" />
-      </form>
-    );
-  }
+  return (
+    <form onSubmit={handleSubmit} className="text-center">
+      <label className="flex flex-col p-4">
+        <span className="text-white">Indirizzo e-mail:</span>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </label>
+      <label className="flex flex-col p-4">
+        <span className="text-white">Password:</span>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </label>
+      <input type="submit" value="Accedi" className="bg-yellow-500 p-2 w-32"/>
+    </form>
+  );
 }
-
-export default LoginForm;

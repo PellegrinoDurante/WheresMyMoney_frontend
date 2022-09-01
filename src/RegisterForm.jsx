@@ -23,11 +23,11 @@ class RegisterForm extends React.Component {
     e.preventDefault();
 
     // Set CSRF Cookie
-    await axios.get("http://wmmbe.test.local/sanctum/csrf-cookie");
+    await axios.get(process.env.REACT_APP_BACKEND_CSRF_TOKEN_URL);
 
     // Request to backend /login
     axios
-      .post("http://wmmbe.test.local/register", {
+      .post(process.env.REACT_APP_BACKEND_REGISTER_URL, {
         name: this.state.name,
         email: this.state.email,
         password: this.state.password,
